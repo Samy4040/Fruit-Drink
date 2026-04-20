@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sideboard Konfigurator | Konfigurator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <div style="margin-bottom: 2rem;">
+      <a href="index.html" style="color: var(--text-muted); text-decoration: none;">&larr; Zurück</a>
+    </div>
+
+    <h1 class="page-title">Gestalte dein Sideboard</h1>
+
+    <div class="card">
+      <div class="konfig-grid">
+        <!-- Vorschau (links) -->
+        <div class="vorschau-container">
+          <div class="sideboard-vorschau mittel weiss" id="sideboardVorschau">
+            <div class="sideboard-deckel" id="deckelElement"></div>
+            <div class="sideboard-korpus">
+              <div class="fach"></div>
+              <div class="fach"></div>
+              <div class="fach"></div>
+              <div class="fach"></div>
+            </div>
+            <div class="sideboard-beine">
+              <div class="bein"></div>
+              <div class="bein"></div>
+            </div>
+          </div>
+          <p style="margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem;">Live-Vorschau</p>
+        </div>
+
+        <!-- Optionen (rechts) -->
+        <div class="optionen">
+          
+          <!-- Farbauswahl -->
+          <div class="option-gruppe">
+            <label>1. Wähle die Farbe</label>
+            <div class="auswahl-buttons" id="farbButtons">
+              <button class="auswahl-btn aktiv" data-wert="weiss" onclick="waehleFarbe('weiss')">
+                <span class="farb-punkt weiss"></span>Weiß
+              </button>
+              <button class="auswahl-btn" data-wert="schwarz" onclick="waehleFarbe('schwarz')">
+                <span class="farb-punkt schwarz"></span>Weiß/Schwarz
+              </button>
+              <button class="auswahl-btn" data-wert="eiche" onclick="waehleFarbe('eiche')">
+                <span class="farb-punkt eiche"></span>Eiche
+              </button>
+            </div>
+          </div>
+
+          <!-- Größenwahl -->
+          <div class="option-gruppe">
+            <label>2. Wähle die Größe</label>
+            <div class="auswahl-buttons" id="groesseButtons">
+              <button class="auswahl-btn" data-wert="klein" onclick="waehleGroesse('klein')">120cm</button>
+              <button class="auswahl-btn aktiv" data-wert="mittel" onclick="waehleGroesse('mittel')">160cm</button>
+              <button class="auswahl-btn" data-wert="gross" onclick="waehleGroesse('gross')">200cm</button>
+            </div>
+          </div>
+
+          <!-- Deckel-Toggle -->
+          <div class="option-gruppe">
+            <label>3. Deckel optional öffnen</label>
+            <button class="btn-secondary" id="deckelBtn" onclick="toggleDeckel()" style="width: 100%;">
+              <span id="deckelText">Deckel hochklappen</span>
+            </button>
+          </div>
+
+          <!-- Speichern-Button -->
+          <div style="margin-top: 3rem;">
+            <button class="btn-primary" style="width: 100%;" onclick="speichereKonfiguration()">
+              Konfiguration speichern
+            </button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    // Lokaler Zustand
+    let aktuelleFarbe = "weiss";
+    let aktuelleGroesse = "mittel";
+    let deckelIstOffen = false;
+
+    // Farbe auswählen
+    function waehleFarbe(farbe) {
+      aktuelleFarbe = farbe;
+      document.querySelectorAll("#farbButtons .auswahl-btn").forEach((btn) => {
+        btn.classList.toggle("aktiv", btn.dataset.wert === farbe);
+      });
+      aktualisiereVorschau();
+    }
+
+    // Größe auswählen
+    function waehleGroesse(groesse) {
+      aktuelleGroesse = groesse;
+      document.querySelectorAll("#groesseButtons .auswahl-btn").forEach((btn) => {
+        btn.classList.toggle("aktiv", btn.dataset.wert === groesse);
+      });
+      aktualisiereVorschau();
+    }
+
+    // Deckel auf/zu
+    function toggleDeckel() {
+      deckelIstOffen = !deckelIstOffen;
+      const deckelEl = document.getElementById("deckelElement");
+      const deckelText = document.getElementById("deckelText");
+      
+      deckelEl.classList.toggle("offen", deckelIstOffen);
+      deckelText.textContent = deckelIstOffen ? "Deckel zuklappen" : "Deckel hochklappen";
+    }
+
+    // Vorschau aktualisieren 
+    function aktualisiereVorschau() {
+      const vorschau = document.getElementById("sideboardVorschau");
+      vorschau.className = "sideboard-vorschau";
+      vorschau.classList.add(aktuelleFarbe, aktuelleGroesse);
+    }
+
+    // Backend: Laden
+    async function ladeKonfiguration() {
+      try {
+        const antwort = await fetch(`${API}/konfiguration`, { credentials: "include" });
+        if(!antwort.ok) return;
+        const konfig = await antwort.json();
+        
+        waehleFarbe(konfig.farbe || "weiss");
+        waehleGroesse(konfig.groesse || "mittel");
+        
+        if (konfig.deckel_offen) {
+          toggleDeckel(); 
+        }
+      } catch (err) {
+        console.error("Fehler beim Laden:", err);
+      }
+    }
+
+    // Backend: Speichern
+    async function speichereKonfiguration() {
+      try {
+        const antwort = await fetch(`${API}/konfiguration`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            farbe: aktuelleFarbe,
+            groesse: aktuelleGroesse,
+            deckel_offen: deckelIstOffen,
+          }),
+        });
+
+        const daten = await antwort.json();
+        if (daten.erfolg) {
+          showToast("Konfiguration gespeichert");
+        }
+      } catch (err) {
+        showToast("Fehler beim Speichern", true);
+      }
+    }
+
+    // Set up on load
+    document.addEventListener("DOMContentLoaded", () => {
+      ladeKonfiguration();
+    });
+  </script>
+</body>
+</html>

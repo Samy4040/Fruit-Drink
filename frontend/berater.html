@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sideboard Konfigurator | KI Berater</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <div style="margin-bottom: 2rem;">
+      <a href="index.html" style="color: var(--text-muted); text-decoration: none;">&larr; Zurück</a>
+    </div>
+
+    <div class="ai-advisor">
+      <h1 class="page-title">Raum-Berater</h1>
+      <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Unsere KI analysiert deine aktuelle Sideboard-Konfiguration und deine Warenkorb-Artikel, um dir den perfekten Einrichtungstipp für dein Zuhause zu geben.
+      </p>
+
+      <button class="btn-primary" id="beraterBtn" onclick="holeBeraterTipp()" style="font-size: 1.1rem; padding: 1.2rem 3rem;">
+        Kostenlosen Tipp anfordern
+      </button>
+
+      <div class="ai-bubble" id="beraterAntwort" style="display: none;">
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <div style="font-size: 2rem; background: var(--white); border-radius: 50%; padding: 0.5rem; box-shadow: var(--shadow-sm);">💡</div>
+          <div>
+            <p id="beraterText" style="line-height: 1.6;"></p>
+            <span class="ai-source" id="beraterQuelle"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    async function holeBeraterTipp() {
+      const btn = document.getElementById("beraterBtn");
+      const antwortDiv = document.getElementById("beraterAntwort");
+      const beraterText = document.getElementById("beraterText");
+      const beraterQuelle = document.getElementById("beraterQuelle");
+
+      btn.disabled = true;
+      btn.innerHTML = "Lade Tipp...";
+      btn.style.opacity = "0.7";
+
+      try {
+        const antwort = await fetch(`${API}/deko-berater`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        const daten = await antwort.json();
+
+        if (daten.fehler) {
+          beraterText.textContent = daten.fehler;
+          beraterQuelle.textContent = "";
+        } else {
+          beraterText.textContent = daten.tipp;
+          beraterQuelle.textContent = daten.quelle === "cache" 
+            ? "Antwort aus dem Cache geladen" 
+            : "Live generiert von Gemini AI";
+        }
+        antwortDiv.style.display = "block";
+      } catch (err) {
+        beraterText.textContent = "Leider konnte kein Tipp generiert werden. Bitte versuche es später erneut.";
+        beraterQuelle.textContent = "";
+        antwortDiv.style.display = "block";
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = "Neuen Tipp anfordern";
+      btn.style.opacity = "1";
+    }
+  </script>
+</body>
+</html>

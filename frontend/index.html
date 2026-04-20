@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sideboard Konfigurator | Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main>
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Dein perfektes Sideboard.</h1>
+        <p>Gestalte ein Möbelstück, das genau zu deinem Leben passt. Wähle Farbe, Größe und Funktionen aus und bestelle direkt mit passendem Zubehör im zeitlosen IKEA-Style.</p>
+        <div style="display: flex; gap: 1.5rem; margin-top: 2rem;">
+          <a href="konfigurator.html" class="btn-primary">Jetzt konfigurieren</a>
+          <a href="shop.html" class="btn-secondary">Zubehör entdecken</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="hero_sideboard.png" alt="Elegantes weißes Sideboard in modernem Wohnzimmer">
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card" onclick="window.location.href='konfigurator.html'">
+        <div class="feature-icon-wrapper">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--ikea-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+        </div>
+        <h3>Völlig anpassbar</h3>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Wähle Farbe, Größe und mehr in einer modernen 3D-Ansicht.</p>
+      </div>
+      <div class="feature-card" onclick="window.location.href='shop.html'">
+        <div class="feature-icon-wrapper">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--ikea-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </div>
+        <h3>Passendes Zubehör</h3>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Ergänze dein Sideboard ganz einfach mit Kabelkanälen und dezentem Licht.</p>
+      </div>
+      <div class="feature-card" onclick="window.location.href='berater.html'">
+        <div class="feature-icon-wrapper">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--ikea-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8V4H8"></path>
+            <rect x="4" y="8" width="16" height="12" rx="2" ry="2"></rect>
+            <path d="M2 14h2"></path>
+            <path d="M20 14h2"></path>
+            <path d="M15 13v2"></path>
+            <path d="M9 13v2"></path>
+          </svg>
+        </div>
+        <h3>KI Raum-Berater</h3>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Lass dir von unserer Cloud-basierten KI individuelle Einrichtungstipps geben.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
