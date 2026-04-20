@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sideboard Konfigurator | Mein Profil</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <div style="margin-bottom: 2rem;">
+      <a href="index.html" style="color: var(--text-muted); text-decoration: none;">&larr; Zurück</a>
+    </div>
+
+    <div class="hero" style="padding: 3rem; margin-bottom: 2rem; grid-template-columns: 1fr;">
+      <div>
+        <h1 class="page-title" style="margin-bottom: 0.5rem;" id="profilName">Mein Profil</h1>
+        <p style="color: var(--text-muted);" id="profilEmail">Lade Daten...</p>
+        <button class="btn-secondary" style="margin-top: 1.5rem;" onclick="doLogout()">Abmelden</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      
+      <!-- Gespeicherte Sideboards -->
+      <div>
+        <h2>Meine Sideboards</h2>
+        <ul class="sideboard-list" id="savedSideboardsList">
+          <p style="color:var(--text-muted);">Lade Sideboards...</p>
+        </ul>
+      </div>
+
+      <!-- Passwort ändern -->
+      <div class="card" style="margin-bottom: 0;">
+        <h2>Passwort ändern</h2>
+        <div style="margin-top: 1.5rem;">
+          <input type="password" id="oldPass" placeholder="Altes Passwort" style="width:100%; padding: 1rem; margin-bottom: 1rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem;">
+          <input type="password" id="newPass" placeholder="Neues Passwort" style="width:100%; padding: 1rem; margin-bottom: 1rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem;">
+          <button class="btn-primary" style="width:100%;" onclick="changePassword()">Passwort aktualisieren</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    async function loadProfile() {
+      try {
+        const res = await fetch(`${API}/profile`, { credentials: "include" });
+        if(!res.ok) {
+          window.location.href = "index.html";
+          return;
+        }
+        const data = await res.json();
+        document.getElementById('profilName').innerText = `Hallo, ${data.profile.username}!`;
+        document.getElementById('profilEmail').innerText = `E-Mail: ${data.profile.email}`;
+      } catch(err) {}
+    }
+
+    async function loadSavedSideboards() {
+      try {
+        const res = await fetch(`${API}/saved-sideboards`, { credentials: "include" });
+        if(!res.ok) return;
+        const boards = await res.json();
+        const list = document.getElementById("savedSideboardsList");
+        
+        if(boards.length === 0) {
+          list.innerHTML = `<p style="color:var(--text-muted);">Noch keine Sideboards gespeichert.</p>`;
+          return;
+        }
+
+        list.innerHTML = boards.map(b => `
+          <li class="sideboard-list-item">
+            <div>
+              <strong style="font-size: 1.1rem; display:block;">${b.name}</strong>
+              <span style="color:var(--text-muted); font-size:0.9rem;">Farbe: ${b.farbe}, Größe: ${b.groesse}, Deckel: ${b.deckel_offen ? 'Offen' : 'Zu'}</span>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn-secondary" style="padding: 0.5rem 1rem;" onclick="loadSideboard(${b.id})">Laden</button>
+              <button class="btn-secondary" style="padding: 0.5rem 1rem; border-color:var(--red); color:var(--red);" onclick="deleteSideboard(${b.id})">Löschen</button>
+            </div>
+          </li>
+        `).join('');
+      } catch(err) {}
+    }
+
+    async function loadSideboard(id) {
+      try {
+        const res = await fetch(`${API}/saved-sideboards/${id}/load`, { method: "POST", credentials: "include" });
+        const data = await res.json();
+        if(res.ok) {
+          showToast(data.nachricht);
+          setTimeout(() => window.location.href = "konfigurator.html", 1000);
+        } else { showToast(data.fehler, true); }
+      } catch(err) {}
+    }
+
+    async function deleteSideboard(id) {
+      if(!confirm("Wirklich löschen?")) return;
+      try {
+        const res = await fetch(`${API}/saved-sideboards/${id}`, { method: "DELETE", credentials: "include" });
+        if(res.ok) {
+          showToast("Gelöscht!");
+          loadSavedSideboards();
+        }
+      } catch(err) {}
+    }
+
+    async function changePassword() {
+      const oldPassword = document.getElementById("oldPass").value;
+      const newPassword = document.getElementById("newPass").value;
+      if(!oldPassword || !newPassword) return showToast("Bitte beide ausfüllen", true);
+
+      try {
+        const res = await fetch(`${API}/profile/password`, {
+          method: "PUT", headers: {"Content-Type": "application/json"},
+          credentials: "include", body: JSON.stringify({oldPassword, newPassword})
+        });
+        const data = await res.json();
+        if(res.ok) {
+          showToast(data.nachricht);
+          document.getElementById("oldPass").value = "";
+          document.getElementById("newPass").value = "";
+        } else {
+          showToast(data.fehler, true);
+        }
+      } catch(err) {}
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Small delay to ensure app.js currentUser is fetched, but we fetch it ourselves anyway
+      loadProfile();
+      loadSavedSideboards();
+    });
+  </script>
+</body>
+</html>

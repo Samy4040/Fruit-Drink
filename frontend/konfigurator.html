@@ -73,10 +73,16 @@
           </div>
 
           <!-- Speichern-Button -->
-          <div style="margin-top: 3rem;">
+          <div style="margin-top: 3rem; display: flex; flex-direction: column; gap: 1rem;">
             <button class="btn-primary" style="width: 100%;" onclick="speichereKonfiguration()">
-              Konfiguration speichern
+              Aktive Konfiguration ändern
             </button>
+            <div id="favoritSpeichernDiv" style="display: none; flex-direction: column; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+              <input type="text" id="favoritName" placeholder="Name für neues Sideboard..." style="padding: 0.8rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-family: inherit;">
+              <button class="btn-secondary" style="width: 100%;" onclick="speichereAlsFavorit()">
+                Als neues Sideboard im Profil speichern
+              </button>
+            </div>
           </div>
           
         </div>
@@ -145,7 +151,7 @@
     }
 
     // Backend: Speichern
-    async function speichereKonfiguration() {
+    async function speichereKonfiguration(silent = false) {
       try {
         const antwort = await fetch(`${API}/konfiguration`, {
           method: "POST",
@@ -159,17 +165,48 @@
         });
 
         const daten = await antwort.json();
-        if (daten.erfolg) {
+        if (daten.erfolg && !silent) {
           showToast("Konfiguration gespeichert");
         }
       } catch (err) {
-        showToast("Fehler beim Speichern", true);
+        if (!silent) showToast("Fehler beim Speichern", true);
+      }
+    }
+
+    async function speichereAlsFavorit() {
+      const name = document.getElementById("favoritName").value;
+      if (!name) return showToast("Bitte Namen eingeben!", true);
+      
+      try {
+        // Zuerst die aktuelle Einstellung übernehmen
+        await speichereKonfiguration(true);
+        const res = await fetch(`${API}/saved-sideboards`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast("Erfolgreich als Sideboard gespeichert!");
+          document.getElementById("favoritName").value = "";
+        } else {
+          showToast(data.fehler, true);
+        }
+      } catch(err) {
+        showToast("Fehler", true);
       }
     }
 
     // Set up on load
     document.addEventListener("DOMContentLoaded", () => {
       ladeKonfiguration();
+      // Zeige Speichern-Feld nur an, wenn der Nutzer eingeloggt ist
+      setTimeout(() => {
+        if (window.currentUser) {
+          document.getElementById('favoritSpeichernDiv').style.display = 'flex';
+        }
+      }, 600); // 600ms warten, damit app.js den user fetchen kann
     });
   </script>
 </body>

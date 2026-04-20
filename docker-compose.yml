@@ -1,5 +1,4 @@
 # docker-compose.yml – Startet alle Services für den Sideboard-Konfigurator
-version: "3.8"
 
 services:
   # MySQL-Datenbank

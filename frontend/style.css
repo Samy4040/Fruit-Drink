@@ -728,3 +728,73 @@ footer {
     gap: 1.5rem;
   }
 }
+
+/* ================================================
+   Auth Modals (Antigravity Feature)
+   ================================================ */
+.auth-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 998;
+  backdrop-filter: blur(4px);
+}
+
+.auth-modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-white);
+  padding: 3rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 999;
+  width: 90%;
+  max-width: 400px;
+}
+
+.auth-modal h2 {
+  margin-bottom: 2rem;
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: -1px;
+}
+
+.auth-modal input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.auth-modal input:focus {
+  outline: none;
+  border-color: var(--ikea-blue);
+}
+
+.auth-modal button {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Profilseiten Liste */
+.sideboard-list {
+  list-style: none;
+  margin-top: 1.5rem;
+}
+
+.sideboard-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
