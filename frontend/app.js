@@ -44,7 +44,7 @@ function injectAuthModals() {
 async function injectLayout() {
   // Check auth status first
   try {
-    const res = await fetch(`${API}/profile`, { credentials: "include" });
+    const res = await fetch(`${API}/auth/me`, { credentials: "include" });
     if (res.ok) {
       const data = await res.json();
       window.currentUser = data.profile;
@@ -122,7 +122,7 @@ async function doLogin() {
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPass').value;
   try {
-    const res = await fetch(`${API}/login`, {
+    const res = await fetch(`${API}/auth/login`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       credentials: "include", body: JSON.stringify({ email, password })
     });
@@ -141,7 +141,7 @@ async function doRegister() {
   const email = document.getElementById('regEmail').value;
   const password = document.getElementById('regPass').value;
   try {
-    const res = await fetch(`${API}/register`, {
+    const res = await fetch(`${API}/auth/register`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       credentials: "include", body: JSON.stringify({ email, username: user, password })
     });
@@ -156,7 +156,7 @@ async function doRegister() {
 }
 
 async function doLogout() {
-  await fetch(`${API}/logout`, { method: "POST", credentials: "include" });
+  await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
   location.href = "index.html";
 }
 
@@ -186,7 +186,7 @@ function showToast(message, isError = false) {
 // 7. Cart
 async function updateCartBadge() {
   try {
-    const res = await fetch(`${API}/warenkorb`, { credentials: "include" });
+    const res = await fetch(`${API}/shop/cart`, { credentials: "include" });
     if (!res.ok) return;
     const items = await res.json();
     const count = items.reduce((acc, item) => acc + item.menge, 0);
@@ -200,7 +200,7 @@ async function updateCartBadge() {
 
 async function addToCart(accessoryId) {
   try {
-    const res = await fetch(`${API}/warenkorb`, {
+    const res = await fetch(`${API}/shop/cart`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       credentials: "include", body: JSON.stringify({ accessory_id: accessoryId }),
     });

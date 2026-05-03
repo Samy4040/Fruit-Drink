@@ -48,7 +48,7 @@
   <script>
     async function loadWarenkorb() {
       try {
-        const res = await fetch(`${API}/warenkorb`, { credentials: "include" });
+        const res = await fetch(`${API}/shop/cart`, { credentials: "include" });
         if (!res.ok) throw new Error("API error");
         const items = await res.json();
 
@@ -110,7 +110,7 @@
 
     async function removeFromCart(itemId) {
       try {
-        await fetch(`${API}/warenkorb/${itemId}`, { method: "DELETE", credentials: "include" });
+        await fetch(`${API}/shop/cart/${itemId}`, { method: "DELETE", credentials: "include" });
         showToast("Artikel entfernt");
         loadWarenkorb();
         updateCartBadge();

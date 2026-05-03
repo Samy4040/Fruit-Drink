@@ -24,7 +24,7 @@
   <script>
     async function loadShop() {
       try {
-        const res = await fetch(`${API}/zubehoer`, { credentials: "include" });
+        const res = await fetch(`${API}/shop/accessories`, { credentials: "include" });
         if (!res.ok) throw new Error("API error");
         const teile = await res.json();
         

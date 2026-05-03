@@ -13,7 +13,13 @@
       <a href="index.html" style="color: var(--text-muted); text-decoration: none;">&larr; Zurück</a>
     </div>
 
-    <h1 class="page-title">Gestalte dein Sideboard</h1>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem;">
+      <h1 class="page-title" style="margin-bottom: 0;">Gestalte dein Sideboard</h1>
+      <div style="text-align: right;">
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Gesamtpreis:</span>
+        <div id="livePreis" style="font-size: 2rem; font-weight: 800; color: var(--text-dark);">299,00 €</div>
+      </div>
+    </div>
 
     <div class="card">
       <div class="konfig-grid">
@@ -22,14 +28,11 @@
           <div class="sideboard-vorschau mittel weiss" id="sideboardVorschau">
             <div class="sideboard-deckel" id="deckelElement"></div>
             <div class="sideboard-korpus">
-              <div class="fach"></div>
-              <div class="fach"></div>
-              <div class="fach"></div>
-              <div class="fach"></div>
+              <div class="fach"></div><div class="fach"></div>
+              <div class="fach"></div><div class="fach"></div>
             </div>
             <div class="sideboard-beine">
-              <div class="bein"></div>
-              <div class="bein"></div>
+              <div class="bein"></div><div class="bein"></div>
             </div>
           </div>
           <p style="margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem;">Live-Vorschau</p>
@@ -38,35 +41,57 @@
         <!-- Optionen (rechts) -->
         <div class="optionen">
           
-          <!-- Farbauswahl -->
           <div class="option-gruppe">
             <label>1. Wähle die Farbe</label>
             <div class="auswahl-buttons" id="farbButtons">
-              <button class="auswahl-btn aktiv" data-wert="weiss" onclick="waehleFarbe('weiss')">
-                <span class="farb-punkt weiss"></span>Weiß
-              </button>
-              <button class="auswahl-btn" data-wert="schwarz" onclick="waehleFarbe('schwarz')">
-                <span class="farb-punkt schwarz"></span>Weiß/Schwarz
-              </button>
-              <button class="auswahl-btn" data-wert="eiche" onclick="waehleFarbe('eiche')">
-                <span class="farb-punkt eiche"></span>Eiche
-              </button>
+              <button class="auswahl-btn" data-wert="weiss" onclick="waehleOption('farbe', 'weiss')"><span class="farb-punkt weiss"></span>Weiß</button>
+              <button class="auswahl-btn" data-wert="schwarz" onclick="waehleOption('farbe', 'schwarz')"><span class="farb-punkt schwarz"></span>Weiß/Schwarz</button>
+              <button class="auswahl-btn" data-wert="eiche" onclick="waehleOption('farbe', 'eiche')"><span class="farb-punkt eiche"></span>Eiche</button>
             </div>
           </div>
 
-          <!-- Größenwahl -->
           <div class="option-gruppe">
-            <label>2. Wähle die Größe</label>
+            <label>2. Wähle die Größe (Grundpreis)</label>
             <div class="auswahl-buttons" id="groesseButtons">
-              <button class="auswahl-btn" data-wert="klein" onclick="waehleGroesse('klein')">120cm</button>
-              <button class="auswahl-btn aktiv" data-wert="mittel" onclick="waehleGroesse('mittel')">160cm</button>
-              <button class="auswahl-btn" data-wert="gross" onclick="waehleGroesse('gross')">200cm</button>
+              <button class="auswahl-btn" data-wert="klein" onclick="waehleOption('groesse', 'klein')">Klein (199€)</button>
+              <button class="auswahl-btn" data-wert="mittel" onclick="waehleOption('groesse', 'mittel')">Mittel (299€)</button>
+              <button class="auswahl-btn" data-wert="gross" onclick="waehleOption('groesse', 'gross')">Groß (399€)</button>
             </div>
           </div>
 
-          <!-- Deckel-Toggle -->
           <div class="option-gruppe">
-            <label>3. Deckel optional öffnen</label>
+            <label>3. Material</label>
+            <div class="auswahl-buttons" id="materialButtons">
+              <button class="auswahl-btn" data-wert="Holz" onclick="waehleOption('material', 'Holz')">Holz (+0€)</button>
+              <button class="auswahl-btn" data-wert="Metall" onclick="waehleOption('material', 'Metall')">Metall (+50€)</button>
+              <button class="auswahl-btn" data-wert="Glas" onclick="waehleOption('material', 'Glas')">Glas (+100€)</button>
+            </div>
+          </div>
+
+          <div class="option-gruppe">
+            <label>4. Finish</label>
+            <div class="auswahl-buttons" id="finishButtons">
+              <button class="auswahl-btn" data-wert="matt" onclick="waehleOption('finish', 'matt')">Matt (+0€)</button>
+              <button class="auswahl-btn" data-wert="glänzend" onclick="waehleOption('finish', 'glänzend')">Glänzend (+30€)</button>
+            </div>
+          </div>
+
+          <div class="option-gruppe">
+             <label>5. Maße Feinabstimmung (im Preis inkludiert)</label>
+             <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+               <span style="flex-basis: 60px;">Breite:</span>
+               <input type="range" id="widthSlider" min="100" max="250" value="160" oninput="updateDimensions()" style="flex-grow: 1;">
+               <span id="widthValue" style="width: 50px;">160cm</span>
+             </div>
+             <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+               <span style="flex-basis: 60px;">Höhe:</span>
+               <input type="range" id="heightSlider" min="50" max="120" value="80" oninput="updateDimensions()" style="flex-grow: 1;">
+               <span id="heightValue" style="width: 50px;">80cm</span>
+             </div>
+          </div>
+
+          <div class="option-gruppe">
+            <label>6. Deckel optional öffnen</label>
             <button class="btn-secondary" id="deckelBtn" onclick="toggleDeckel()" style="width: 100%;">
               <span id="deckelText">Deckel hochklappen</span>
             </button>
@@ -75,7 +100,7 @@
           <!-- Speichern-Button -->
           <div style="margin-top: 3rem; display: flex; flex-direction: column; gap: 1rem;">
             <button class="btn-primary" style="width: 100%;" onclick="speichereKonfiguration()">
-              Aktive Konfiguration ändern
+              Aktive Konfiguration speichern & aktualisieren
             </button>
             <div id="favoritSpeichernDiv" style="display: none; flex-direction: column; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
               <input type="text" id="favoritName" placeholder="Name für neues Sideboard..." style="padding: 0.8rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-family: inherit;">
@@ -92,82 +117,90 @@
 
   <script src="app.js"></script>
   <script>
-    // Lokaler Zustand
-    let aktuelleFarbe = "weiss";
-    let aktuelleGroesse = "mittel";
-    let deckelIstOffen = false;
+    let konfig = {
+      farbe: "weiss",
+      groesse: "mittel",
+      material: "Holz",
+      finish: "matt",
+      width_cm: 160,
+      height_cm: 80,
+      depth_cm: 40,
+      deckel_offen: false
+    };
 
-    // Farbe auswählen
-    function waehleFarbe(farbe) {
-      aktuelleFarbe = farbe;
-      document.querySelectorAll("#farbButtons .auswahl-btn").forEach((btn) => {
-        btn.classList.toggle("aktiv", btn.dataset.wert === farbe);
-      });
-      aktualisiereVorschau();
-    }
-
-    // Größe auswählen
-    function waehleGroesse(groesse) {
-      aktuelleGroesse = groesse;
-      document.querySelectorAll("#groesseButtons .auswahl-btn").forEach((btn) => {
-        btn.classList.toggle("aktiv", btn.dataset.wert === groesse);
-      });
-      aktualisiereVorschau();
-    }
-
-    // Deckel auf/zu
-    function toggleDeckel() {
-      deckelIstOffen = !deckelIstOffen;
-      const deckelEl = document.getElementById("deckelElement");
-      const deckelText = document.getElementById("deckelText");
+    function rechnePreis() {
+      let preis = 199;
+      if (konfig.groesse === 'mittel') preis = 299;
+      if (konfig.groesse === 'gross') preis = 399;
       
-      deckelEl.classList.toggle("offen", deckelIstOffen);
-      deckelText.textContent = deckelIstOffen ? "Deckel zuklappen" : "Deckel hochklappen";
+      if (konfig.material === 'Metall') preis += 50;
+      if (konfig.material === 'Glas') preis += 100;
+      if (konfig.finish === 'glänzend') preis += 30;
+      
+      document.getElementById('livePreis').textContent = preis.toFixed(2).replace('.', ',') + " €";
     }
 
-    // Vorschau aktualisieren 
+    function waehleOption(typ, wert) {
+      konfig[typ] = wert;
+      // Buttons aktualisieren
+      const containerId = typ + 'Buttons';
+      if (document.getElementById(containerId)) {
+        document.querySelectorAll(`#${containerId} .auswahl-btn`).forEach(btn => {
+          btn.classList.toggle("aktiv", btn.dataset.wert === wert);
+        });
+      }
+      
+      aktualisiereVorschau();
+      rechnePreis();
+    }
+
+    function updateDimensions() {
+      konfig.width_cm = document.getElementById('widthSlider').value;
+      konfig.height_cm = document.getElementById('heightSlider').value;
+      document.getElementById('widthValue').textContent = konfig.width_cm + 'cm';
+      document.getElementById('heightValue').textContent = konfig.height_cm + 'cm';
+      rechnePreis();
+    }
+
+    function toggleDeckel() {
+      konfig.deckel_offen = !konfig.deckel_offen;
+      document.getElementById("deckelElement").classList.toggle("offen", konfig.deckel_offen);
+      document.getElementById("deckelText").textContent = konfig.deckel_offen ? "Deckel zuklappen" : "Deckel hochklappen";
+    }
+
     function aktualisiereVorschau() {
       const vorschau = document.getElementById("sideboardVorschau");
-      vorschau.className = "sideboard-vorschau";
-      vorschau.classList.add(aktuelleFarbe, aktuelleGroesse);
+      vorschau.className = "sideboard-vorschau " + konfig.farbe + " " + konfig.groesse;
     }
 
-    // Backend: Laden
     async function ladeKonfiguration() {
       try {
-        const antwort = await fetch(`${API}/konfiguration`, { credentials: "include" });
+        const antwort = await fetch(`${API}/config`, { credentials: "include" });
         if(!antwort.ok) return;
-        const konfig = await antwort.json();
+        const dbKonfig = await antwort.json();
         
-        waehleFarbe(konfig.farbe || "weiss");
-        waehleGroesse(konfig.groesse || "mittel");
+        waehleOption('farbe', dbKonfig.farbe || "weiss");
+        waehleOption('groesse', dbKonfig.groesse || "mittel");
+        waehleOption('material', dbKonfig.material || "Holz");
+        waehleOption('finish', dbKonfig.finish || "matt");
         
-        if (konfig.deckel_offen) {
-          toggleDeckel(); 
-        }
-      } catch (err) {
-        console.error("Fehler beim Laden:", err);
-      }
+        document.getElementById('widthSlider').value = dbKonfig.width_cm || 160;
+        document.getElementById('heightSlider').value = dbKonfig.height_cm || 80;
+        updateDimensions();
+
+        if (dbKonfig.deckel_offen) { toggleDeckel(); }
+        rechnePreis();
+      } catch (err) {}
     }
 
-    // Backend: Speichern
     async function speichereKonfiguration(silent = false) {
       try {
-        const antwort = await fetch(`${API}/konfiguration`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            farbe: aktuelleFarbe,
-            groesse: aktuelleGroesse,
-            deckel_offen: deckelIstOffen,
-          }),
+        const antwort = await fetch(`${API}/config`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          credentials: "include", body: JSON.stringify(konfig),
         });
-
         const daten = await antwort.json();
-        if (daten.erfolg && !silent) {
-          showToast("Konfiguration gespeichert");
-        }
+        if (daten.erfolg && !silent) { showToast("Konfiguration gespeichert"); updateCartBadge(); }
       } catch (err) {
         if (!silent) showToast("Fehler beim Speichern", true);
       }
@@ -176,37 +209,33 @@
     async function speichereAlsFavorit() {
       const name = document.getElementById("favoritName").value;
       if (!name) return showToast("Bitte Namen eingeben!", true);
-      
       try {
-        // Zuerst die aktuelle Einstellung übernehmen
         await speichereKonfiguration(true);
-        const res = await fetch(`${API}/saved-sideboards`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ name })
+        const res = await fetch(`${API}/config/saved`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          credentials: "include", body: JSON.stringify({ name })
         });
-        const data = await res.json();
         if (res.ok) {
-          showToast("Erfolgreich als Sideboard gespeichert!");
+          showToast("Als Profil-Favorit gespeichert!");
           document.getElementById("favoritName").value = "";
-        } else {
-          showToast(data.fehler, true);
         }
-      } catch(err) {
-        showToast("Fehler", true);
-      }
+      } catch(err) { showToast("Fehler", true); }
     }
 
-    // Set up on load
     document.addEventListener("DOMContentLoaded", () => {
+      // Default UI setup
+      waehleOption('farbe', konfig.farbe);
+      waehleOption('groesse', konfig.groesse);
+      waehleOption('material', konfig.material);
+      waehleOption('finish', konfig.finish);
+      
       ladeKonfiguration();
-      // Zeige Speichern-Feld nur an, wenn der Nutzer eingeloggt ist
+      
       setTimeout(() => {
         if (window.currentUser) {
           document.getElementById('favoritSpeichernDiv').style.display = 'flex';
         }
-      }, 600); // 600ms warten, damit app.js den user fetchen kann
+      }, 600);
     });
   </script>
 </body>
