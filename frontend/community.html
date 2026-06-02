@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FruitDrink | Community</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">🍹 FruitDrink Co.</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="konfigurator.html">Konfigurator</a>
+      <a href="shop.html">Shop</a>
+      <a href="impressionen.html">Impressionen</a>
+      <a href="community.html">Community</a>
+    </div>
+  </nav>
+
+  <main>
+    <h1 class="page-title">👥 Community Drinks</h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Entdecke Drink-Kreationen anderer Nutzer und teile deine eigenen!</p>
+
+    <!-- Drink teilen -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <h2 style="margin-bottom: 1.5rem;">🍹 Deinen Drink teilen</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Dein Name</label>
+          <input type="text" id="shareUsername" placeholder="z.B. Max"
+            style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Name des Drinks</label>
+          <input type="text" id="shareName" placeholder="z.B. Mein Lieblingsdrink"
+            style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; box-sizing: border-box;">
+        </div>
+      </div>
+      <button class="btn-primary" style="margin-top: 1rem;" onclick="teileDrink()">
+        Aktuellen Konfigurator-Drink teilen 🍹
+      </button>
+    </div>
+
+    <!-- Community Liste -->
+    <div id="communityGrid" class="shop-grid">
+      <p style="color: var(--text-muted);">Lade Community Drinks...</p>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const fruchtemoji = {
+      apfel: "🍎", orange: "🍊", mango: "🥭", erdbeere: "🍓",
+      ananas: "🍍", kiwi: "🥝", himbeere: "🫐", zitrone: "🍋", keine: ""
+    };
+
+    async function ladeCommunity() {
+      try {
+        const res = await fetch(`${API}/config/community`, { credentials: "include" });
+        const drinks = await res.json();
+        const grid = document.getElementById("communityGrid");
+
+        if (drinks.length === 0) {
+          grid.innerHTML = "<p>Noch keine Community Drinks vorhanden.</p>";
+          return;
+        }
+
+        grid.innerHTML = "";
+        drinks.forEach(d => {
+          const emoji =
+            (fruchtemoji[d.frucht1] || "") +
+            (d.frucht2 !== "keine" ? fruchtemoji[d.frucht2] || "" : "") +
+            (d.frucht3 !== "keine" ? fruchtemoji[d.frucht3] || "" : "");
+
+          const zutaten = [d.frucht1, d.frucht2, d.frucht3]
+            .filter(f => f && f !== "keine").join(" + ");
+
+          const groesseLabel = { klein: "250ml", mittel: "500ml", gross: "750ml" };
+
+          grid.innerHTML += `
+            <div class="product-card" style="text-align: center;">
+              <div style="font-size: 3rem; margin: 1rem 0;">${emoji}🥤</div>
+              <h3 class="product-name">${d.name}</h3>
+              <p class="product-desc">von <strong>${d.username}</strong></p>
+              <p class="product-desc">${zutaten}</p>
+              <p class="product-desc" style="color: var(--text-muted);">${groesseLabel[d.groesse] || d.groesse}</p>
+            </div>`;
+        });
+      } catch (err) {
+        document.getElementById("communityGrid").innerHTML = "<p>Fehler beim Laden.</p>";
+      }
+    }
+
+    async function teileDrink() {
+      const username = document.getElementById("shareUsername").value;
+      const name = document.getElementById("shareName").value;
+
+      if (!username || !name) {
+        showToast("Bitte Name und Drink-Name eingeben!", true);
+        return;
+      }
+
+      try {
+        const konfRes = await fetch(`${API}/config`, { credentials: "include" });
+        const konfig = await konfRes.json();
+
+        if (!konfig.frucht1) {
+          showToast("Bitte erst einen Drink im Konfigurator erstellen!", true);
+          return;
+        }
+
+        const res = await fetch(`${API}/config/community`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            username, name,
+            frucht1: konfig.frucht1,
+            frucht2: konfig.frucht2 || "keine",
+            frucht3: konfig.frucht3 || "keine",
+            groesse: konfig.groesse || "mittel"
+          })
+        });
+
+        const data = await res.json();
+        if (data.erfolg) {
+          showToast("Drink geteilt! 🍹");
+          document.getElementById("shareUsername").value = "";
+          document.getElementById("shareName").value = "";
+          ladeCommunity();
+        }
+      } catch (err) {
+        showToast("Fehler beim Teilen", true);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", ladeCommunity);
+  </script>
+</body>
+</html>

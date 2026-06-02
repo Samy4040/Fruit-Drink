@@ -3,26 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sideboard Konfigurator | Warenkorb</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <title>FruitDrink | Warenkorb</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-brand">🍹 FruitDrink Co.</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="konfigurator.html">Konfigurator</a>
+      <a href="shop.html">Shop</a>
+      <a href="impressionen.html">Impressionen</a>
+      <a href="community.html">Community</a>
+    </div>
+  </nav>
+
   <main>
     <div style="margin-bottom: 2rem;">
       <a href="shop.html" style="color: var(--text-muted); text-decoration: none;">&larr; Weiter einkaufen</a>
     </div>
 
-    <h1 class="page-title">Warenkorb</h1>
+    <h1 class="page-title">🛒 Warenkorb</h1>
 
     <div class="cart-layout" id="cartLayout">
-      <!-- Items List -->
       <ul class="cart-items" id="cartList"></ul>
 
-      <!-- Summary Sidebar -->
       <div class="cart-summary" id="cartSummary" style="display: none;">
         <h2 style="margin-bottom: 1.5rem; font-size: 1.2rem;">Bestellübersicht</h2>
-        
         <div class="summary-row">
           <span style="color: var(--text-muted);">Artikel</span>
           <span id="summaryCount">0</span>
@@ -31,14 +38,13 @@
           <span style="color: var(--text-muted);">Lieferung</span>
           <span>Kostenlos</span>
         </div>
-        
         <div class="summary-total">
           <span>Gesamt</span>
           <span id="summaryTotal">0,00 €</span>
         </div>
-
-        <button class="btn-primary" style="width: 100%; margin-top: 2rem;" onclick="window.location.href='checkout.html'">
-          Zur Kasse gehen
+        <button class="btn-primary" style="width: 100%; margin-top: 2rem;"
+          onclick="window.location.href='checkout.html'">
+          Zur Kasse →
         </button>
       </div>
     </div>
@@ -49,82 +55,88 @@
     async function loadWarenkorb() {
       try {
         const res = await fetch(`${API}/shop/cart`, { credentials: "include" });
-        if (!res.ok) throw new Error("API error");
         const items = await res.json();
-
         const list = document.getElementById("cartList");
         const summary = document.getElementById("cartSummary");
 
-        if (items.length === 0) {
+        const drinkData = sessionStorage.getItem("drinkImWarenkorb");
+        const drink = drinkData ? JSON.parse(drinkData) : null;
+
+        if (items.length === 0 && !drink) {
           list.innerHTML = `
             <div class="cart-empty">
-              <h3 style="margin-bottom: 1rem;">Dein Warenkorb ist leer</h3>
+              <h3 style="margin-bottom: 1rem;">Dein Warenkorb ist leer 🛒</h3>
               <a href="shop.html" class="btn-secondary">Zum Shop</a>
-            </div>
-          `;
+            </div>`;
           summary.style.display = "none";
           return;
         }
 
         let total = 0;
-        let itemSum = 0;
+        let count = 0;
         list.innerHTML = "";
+
+        if (drink) {
+          total += drink.preis;
+          count += 1;
+          list.innerHTML += `
+            <li class="cart-item">
+              <div style="font-size: 3rem; width: 80px; text-align: center;">🍹</div>
+              <div class="cart-item-details">
+                <div class="cart-item-title">${drink.name}</div>
+                <div style="color: var(--text-muted);">Größe: ${drink.groesse}</div>
+                <div class="cart-item-actions">
+                  <button class="btn-icon-only" onclick="drinkEntfernen()">🗑️</button>
+                </div>
+              </div>
+              <div class="cart-item-price">${drink.preis.toFixed(2).replace(".", ",")} €</div>
+            </li>`;
+        }
 
         items.forEach(item => {
           const preis = Number(item.preis) * item.menge;
           total += preis;
-          itemSum += item.menge;
-          
+          count += item.menge;
           list.innerHTML += `
             <li class="cart-item">
               <img class="cart-item-img" src="${item.bild_url}" alt="${item.name}"
-                   onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 120%22><rect fill=%22%23F5F5F5%22 width=%22120%22 height=%22120%22/></svg>'">
-              
+                onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 120%22><rect fill=%22%23f0f0f0%22 width=%22120%22 height=%22120%22/></svg>'">
               <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
-                <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">Artikelnr: ${item.id}000</div>
-                
                 <div class="cart-item-actions">
-                  <span style="font-weight: 500; background: var(--bg-light); padding: 0.2rem 0.8rem; border-radius: 4px;">Menge: ${item.menge}</span>
-                  <button class="btn-icon-only" onclick="removeFromCart('${item.id}')" title="Entfernen">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>
-                  </button>
+                  <span style="background: var(--bg-light); padding: 0.2rem 0.8rem; border-radius: 4px;">
+                    Menge: ${item.menge}
+                  </span>
+                  <button class="btn-icon-only" onclick="removeFromCart('${item.id}')">🗑️</button>
                 </div>
               </div>
-              
-              <div class="cart-item-price">
-                ${preis.toFixed(2).replace('.', ',')} €
-              </div>
-            </li>
-          `;
+              <div class="cart-item-price">${preis.toFixed(2).replace(".", ",")} €</div>
+            </li>`;
         });
 
-        document.getElementById("summaryCount").textContent = itemSum;
-        document.getElementById("summaryTotal").textContent = total.toFixed(2).replace('.', ',') + " €";
+        document.getElementById("summaryCount").textContent = count;
+        document.getElementById("summaryTotal").textContent = total.toFixed(2).replace(".", ",") + " €";
         summary.style.display = "block";
-        
       } catch (err) {
-        document.getElementById("cartList").innerHTML = `<p class="error">Warenkorb konnte nicht geladen werden.</p>`;
+        document.getElementById("cartList").innerHTML = "<p>Fehler beim Laden.</p>";
       }
     }
 
-    async function removeFromCart(itemId) {
-      try {
-        await fetch(`${API}/shop/cart/${itemId}`, { method: "DELETE", credentials: "include" });
-        showToast("Artikel entfernt");
-        loadWarenkorb();
-        updateCartBadge();
-      } catch (err) {
-        showToast("Fehler", true);
-      }
-    }
-
-    // Assign to window so app.js can call it
-    window.loadWarenkorb = loadWarenkorb;
-
-    document.addEventListener("DOMContentLoaded", () => {
+    function drinkEntfernen() {
+      sessionStorage.removeItem("drinkImWarenkorb");
+      showToast("Drink entfernt");
       loadWarenkorb();
-    });
+    }
+
+    async function removeFromCart(id) {
+      await fetch(`${API}/shop/cart/${id}`, { method: "DELETE", credentials: "include" });
+      showToast("Artikel entfernt");
+      loadWarenkorb();
+      updateCartBadge();
+    }
+
+    window.loadWarenkorb = loadWarenkorb;
+    document.addEventListener("DOMContentLoaded", loadWarenkorb);
   </script>
 </body>
 </html>

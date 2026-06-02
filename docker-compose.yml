@@ -1,29 +1,29 @@
-# docker-compose.yml – Startet alle Services für den Sideboard-Konfigurator
+# docker-compose.yml – Startet alle Services für den Fruit Drink Konfigurator
 
 services:
   # MySQL-Datenbank
   mysql:
     image: mysql:8.0
-    container_name: sideboard-mysql
+    container_name: fruitdrink-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-sideboard123}
-      MYSQL_DATABASE: sideboard_db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-fruitdrink123}
+      MYSQL_DATABASE: fruitdrink_db
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-sideboard123}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-fruitdrink123}"]
       interval: 10s
       timeout: 5s
       retries: 10
 
-  # Redis für Sessions und KI-Cache
+  # Redis für Sessions und Cache
   redis:
     image: redis:7-alpine
-    container_name: sideboard-redis
+    container_name: fruitdrink-redis
     restart: always
     ports:
       - "6379:6379"
@@ -36,19 +36,18 @@ services:
   # Node.js Backend
   backend:
     build: ./backend
-    container_name: sideboard-backend
+    container_name: fruitdrink-backend
     restart: always
     ports:
       - "3000:3000"
     environment:
       DB_HOST: mysql
       DB_USER: root
-      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-sideboard123}
-      DB_NAME: sideboard_db
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-fruitdrink123}
+      DB_NAME: fruitdrink_db
       REDIS_HOST: redis
       REDIS_PORT: 6379
       SESSION_SECRET: ${SESSION_SECRET:-mein-geheimes-session-secret}
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
       NODE_ENV: production
     depends_on:
       mysql:
@@ -59,7 +58,7 @@ services:
   # Nginx Frontend
   frontend:
     build: ./frontend
-    container_name: sideboard-frontend
+    container_name: fruitdrink-frontend
     restart: always
     ports:
       - "8080:80"

@@ -4,20 +4,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --ikea-blue: #0058A3;
-  --ikea-yellow: #FBD914;
-  --bg-light: #F9F9F9;
+  --ikea-blue: #2E7D32;
+  --ikea-yellow: #FFC107;
+  --bg-light: #F9FBF9;
   --bg-white: #FFFFFF;
   --text-dark: #1A1A1A;
   --text-muted: #666666;
   --border: #E5E5E5;
-  --green: #0A8A00;
-  --red: #E00000;
-  
+  --green: #2E7D32;
+  --red: #D32F2F;
+
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
-  
+
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-pill: 64px;

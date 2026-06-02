@@ -1,5 +1,4 @@
--- init.sql – Erweitertes Schema für die E-Commerce-Plattform (Antigravity-Edition)
--- Falls die Tabellen schon existieren, werden sie nicht verändert, außer man macht 'docker-compose down -v'
+-- init.sql – Fruit Drink Company Datenbank
 
 -- 1. Benutzer
 CREATE TABLE IF NOT EXISTS users (
@@ -9,56 +8,37 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     first_name VARCHAR(100) DEFAULT '',
     last_name VARCHAR(100) DEFAULT '',
-    phone VARCHAR(50) DEFAULT '',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_verified BOOLEAN DEFAULT FALSE,
-    reset_token VARCHAR(255) NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Adressbuch
-CREATE TABLE IF NOT EXISTS addresses (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    address_line1 VARCHAR(255) NOT NULL,
-    address_line2 VARCHAR(255) DEFAULT '',
-    city VARCHAR(100) NOT NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    country VARCHAR(100) DEFAULT 'Deutschland',
-    is_default BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- 3. Laufende Konfiguration
+-- 2. Konfigurationen (Fruit Drink)
 CREATE TABLE IF NOT EXISTS configurations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
     user_id INT DEFAULT NULL,
-    name VARCHAR(255) DEFAULT 'Mein Sideboard',
-    farbe VARCHAR(50) DEFAULT 'weiss',
+    name VARCHAR(255) DEFAULT 'Mein Fruit Drink',
+    frucht1 VARCHAR(50) DEFAULT 'apfel',
+    frucht2 VARCHAR(50) DEFAULT 'orange',
+    frucht3 VARCHAR(50) DEFAULT 'keine',
     groesse VARCHAR(20) DEFAULT 'mittel',
-    deckel_offen BOOLEAN DEFAULT FALSE,
-    width_cm INT DEFAULT 160,
-    height_cm INT DEFAULT 80,
-    depth_cm INT DEFAULT 40,
-    material VARCHAR(100) DEFAULT 'Holz',
-    finish VARCHAR(100) DEFAULT 'matt',
     erstellt_am TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     aktualisiert_am TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_session (session_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    INDEX idx_session (session_id)
 );
 
--- 4. Benutzer-Favoriten Sideboards
-CREATE TABLE IF NOT EXISTS saved_sideboards (
+-- 3. Community Drinks (von anderen Nutzern)
+CREATE TABLE IF NOT EXISTS community_drinks (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    username VARCHAR(100) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    config_snapshot JSON NOT NULL, -- Speichert das komplette Objekt
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    frucht1 VARCHAR(50) NOT NULL,
+    frucht2 VARCHAR(50) DEFAULT 'keine',
+    frucht3 VARCHAR(50) DEFAULT 'keine',
+    groesse VARCHAR(20) DEFAULT 'mittel',
+    erstellt_am TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. Zubehör & Shop-Katalog
+-- 4. Shop Artikel (Küchenartikel)
 CREATE TABLE IF NOT EXISTS accessories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -70,76 +50,44 @@ CREATE TABLE IF NOT EXISTS accessories (
     is_active BOOLEAN DEFAULT TRUE
 );
 
--- 6. Warenkorb
+-- 5. Warenkorb
 CREATE TABLE IF NOT EXISTS cart_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
-    user_id INT DEFAULT NULL,
     accessory_id INT NOT NULL,
     menge INT DEFAULT 1,
     hinzugefuegt_am TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_cart_session (session_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (accessory_id) REFERENCES accessories(id) ON DELETE CASCADE
 );
 
--- 7. Bestellungen
+-- 6. Bestellungen
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
     order_number VARCHAR(50) UNIQUE NOT NULL,
-    status ENUM('pending', 'paid', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
+    vorname VARCHAR(100) NOT NULL,
+    nachname VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    adresse TEXT NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
-    shipping_address JSON NOT NULL,
-    payment_method VARCHAR(100) DEFAULT 'Rechnung',
-    payment_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
-    stripe_payment_intent_id VARCHAR(255) NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    delivered_at TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 8. Bestell-Bestandteile
-CREATE TABLE IF NOT EXISTS order_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    product_type ENUM('sideboard', 'accessory') NOT NULL,
-    product_id INT NULL, 
-    product_name VARCHAR(255) NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    unit_price DECIMAL(10,2) NOT NULL,
-    config_snapshot JSON NULL, -- Speziell für bestellte Sideboards
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
-);
-
--- 9. Bewertungen
-CREATE TABLE IF NOT EXISTS reviews (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    product_type ENUM('sideboard', 'accessory') NOT NULL,
-    product_id INT NOT NULL,
-    rating INT CHECK (rating >= 1 AND rating <= 5),
-    comment TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- 10. AI Cache
-CREATE TABLE IF NOT EXISTS ai_cache (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    prompt_hash VARCHAR(64) UNIQUE NOT NULL,
-    response TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP NOT NULL
-);
-
-
--- Mock Data für Accessories / Shop
+-- Shop Artikel Beispieldaten
 INSERT INTO accessories (name, preis, bild_url, beschreibung, category) VALUES
-('LED-Lichtleiste 120cm', 24.99, 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=300&h=200&fit=crop', 'Warmweiße LED-Leiste', 'Beleuchtung'),
-('Organizer-Einsatz Holz', 14.99, 'https://images.unsplash.com/photo-1595079676339-1534801ad6cf?w=300&h=200&fit=crop', 'Bambus Facheinteilung', 'Innenausstattung'),
-('Premium Kabeldurchführung', 7.99, 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=300&h=200&fit=crop', 'Aluminium', 'Elektronik'),
-('Filz-Einlage (Grau)', 9.99, 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=300&h=200&fit=crop', 'Schützt empfindliche Oberflächen', 'Schutz'),
-('Glasplatte (Maßanfertigung)', 39.99, 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&h=200&fit=crop', 'Gehärtetes Glas als Deckplatte, 6mm', 'Oberfläche'),
-('Deko-Vase (Nordic)', 19.99, 'https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=300&h=200&fit=crop', 'Keramik in Weiß', 'Dekoration'),
-('Griffe "Klassik" (2er)', 12.99, 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&h=200&fit=crop', 'Messing-Look', 'Griffe');
+('Smoothie Glas 500ml', 8.99, 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&h=200&fit=crop', 'Hochwertiges Trinkglas', 'Gläser'),
+('Mixer Pro 1000W', 49.99, 'https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=300&h=200&fit=crop', 'Leistungsstarker Standmixer', 'Geräte'),
+('Strohhalm Set (10er)', 3.99, 'https://images.unsplash.com/photo-1559181567-c3190ca9d222?w=300&h=200&fit=crop', 'Wiederverwendbare Strohhalme', 'Zubehör'),
+('Schneidebrett Bambus', 12.99, 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=300&h=200&fit=crop', 'Nachhaltiges Bambusbrett', 'Küche'),
+('Saftpresse Manuell', 15.99, 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=200&fit=crop', 'Für Zitronen und Orangen', 'Geräte'),
+('Trinkflasche 750ml', 18.99, 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=300&h=200&fit=crop', 'Edelstahl, isoliert', 'Gläser'),
+('Sieb Feinmaschig', 6.99, 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=200&fit=crop', 'Für fruchtiges Filtern', 'Küche');
+
+-- Community Drinks Beispieldaten
+INSERT INTO community_drinks (username, name, frucht1, frucht2, frucht3, groesse) VALUES
+('Max', 'Tropical Sunrise', 'mango', 'ananas', 'orange', 'gross'),
+('Lisa', 'Berry Blast', 'erdbeere', 'himbeere', 'keine', 'mittel'),
+('Tom', 'Green Power', 'apfel', 'kiwi', 'keine', 'klein'),
+('Sara', 'Citrus Mix', 'orange', 'zitrone', 'mango', 'gross'),
+('Felix', 'Classic Apple', 'apfel', 'keine', 'keine', 'mittel');

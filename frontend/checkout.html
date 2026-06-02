@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sideboard Konfigurator | Kasse</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+  <title>FruitDrink | Kasse</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .checkout-form {
@@ -15,86 +14,69 @@
       max-width: 600px;
       margin: 0 auto;
     }
-    
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 700;
-    }
-    
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 700; }
     .form-group input {
-      width: 100%;
-      padding: 0.8rem;
+      width: 100%; padding: 0.8rem;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      font-family: inherit;
+      font-family: inherit; box-sizing: border-box;
     }
-    
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--ikea-blue);
-    }
-    
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   </style>
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-brand">🍹 FruitDrink Co.</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="konfigurator.html">Konfigurator</a>
+      <a href="shop.html">Shop</a>
+      <a href="impressionen.html">Impressionen</a>
+      <a href="community.html">Community</a>
+    </div>
+  </nav>
+
   <main>
     <div style="margin-bottom: 2rem;">
       <a href="warenkorb.html" style="color: var(--text-muted); text-decoration: none;">&larr; Zurück zum Warenkorb</a>
     </div>
 
-    <h1 class="page-title" style="text-align: center;">Kasse</h1>
+    <h1 class="page-title" style="text-align: center;">💳 Kasse</h1>
 
     <div class="checkout-form">
       <h2 style="margin-bottom: 2rem;">Lieferadresse</h2>
-      
+
       <form id="checkoutForm">
         <div class="form-row">
           <div class="form-group">
-            <label for="vorname">Vorname</label>
-            <input type="text" id="vorname" required placeholder="z.B. Max">
+            <label>Vorname</label>
+            <input type="text" id="vorname" required placeholder="Max">
           </div>
           <div class="form-group">
-            <label for="nachname">Nachname</label>
-            <input type="text" id="nachname" required placeholder="z.B. Mustermann">
+            <label>Nachname</label>
+            <input type="text" id="nachname" required placeholder="Mustermann">
           </div>
         </div>
-        
         <div class="form-group">
-          <label for="adresse">Straße und Hausnummer</label>
-          <input type="text" id="adresse" required placeholder="Musterstraße 1">
+          <label>E-Mail</label>
+          <input type="email" id="email" required placeholder="max@example.com">
         </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="plz">PLZ</label>
-            <input type="text" id="plz" required placeholder="12345">
-          </div>
-          <div class="form-group">
-            <label for="stadt">Stadt</label>
-            <input type="text" id="stadt" required placeholder="Berlin">
-          </div>
+        <div class="form-group">
+          <label>Straße und Hausnummer</label>
+          <input type="text" id="adresse" required placeholder="Musterstraße 1, 12345 Berlin">
         </div>
-        
+
         <hr style="border: none; border-top: 1px solid var(--border); margin: 2rem 0;">
-        
+
         <h2 style="margin-bottom: 1.5rem;">Zahlung</h2>
         <div style="background: var(--bg-light); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 2rem; border: 1px solid var(--border);">
-          <p style="font-weight: 700; margin-bottom: 0.5rem;">Zahlung auf Rechnung (Demo / Stripe-Mock)</p>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Die Rechnung wird nach der Lieferung separat verschickt.</p>
+          <p style="font-weight: 700; margin-bottom: 0.5rem;">💰 Zahlung auf Rechnung</p>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Die Rechnung wird nach der Lieferung verschickt.</p>
         </div>
 
         <button type="submit" class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.2rem;">
-          Jetzt zahlungspflichtig bestellen
+          Jetzt bestellen 🍹
         </button>
       </form>
     </div>
@@ -102,58 +84,37 @@
 
   <script src="app.js"></script>
   <script>
-    document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+    document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      if (!window.currentUser) {
-        showToast("Bitte logge dich ein, um fortzufahren", true);
-        showLogin();
-        return;
-      }
+      const btn = e.target.querySelector("button");
+      btn.disabled = true;
+      btn.textContent = "Verarbeite...";
 
       try {
-        const btn = e.target.querySelector('button');
-        btn.disabled = true;
-        btn.textContent = "Verarbeite Bestellung...";
-
-        const address = {
-          vorname: document.getElementById('vorname').value,
-          nachname: document.getElementById('nachname').value,
-          adresse: document.getElementById('adresse').value,
-          plz: document.getElementById('plz').value,
-          stadt: document.getElementById('stadt').value
-        };
-
-        const res = await fetch(`${window.API}/shop/checkout`, {
+        const res = await fetch(`${API}/shop/checkout`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ shipping_address: address })
+          body: JSON.stringify({
+            vorname: document.getElementById("vorname").value,
+            nachname: document.getElementById("nachname").value,
+            email: document.getElementById("email").value,
+            adresse: document.getElementById("adresse").value
+          })
         });
-
         const data = await res.json();
-
         if (res.ok) {
-          showToast(`Bestellung #${data.order_number} erfolgreich!`);
-          setTimeout(() => {
-            window.location.href = "profil.html";
-          }, 2000);
+          window.location.href = `erfolg.html?order=${data.order_number}`;
         } else {
-          showToast(data.fehler || "Es gab ein Problem.", true);
+          showToast(data.fehler || "Fehler beim Bestellen", true);
           btn.disabled = false;
-          btn.textContent = "Jetzt zahlungspflichtig bestellen";
+          btn.textContent = "Jetzt bestellen 🍹";
         }
       } catch (err) {
-        showToast("Netzwerkfehler beim Checkout", true);
+        showToast("Netzwerkfehler", true);
+        btn.disabled = false;
+        btn.textContent = "Jetzt bestellen 🍹";
       }
-    });
-
-    document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        if (!window.currentUser) {
-          showToast("Bitte logge dich vor der Bestellung ein.");
-        }
-      }, 500);
     });
   </script>
 </body>
