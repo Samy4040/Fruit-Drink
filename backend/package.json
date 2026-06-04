@@ -1,7 +1,7 @@
 {
-  "name": "sideboard-backend",
+  "name": "fruitdrink-backend",
   "version": "1.0.0",
-  "description": "Backend für den Sideboard-Konfigurator mit KI-Berater",
+  "description": "Backend für die FruitDrink Company Web-Anwendung",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
