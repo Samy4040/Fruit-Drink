@@ -5,6 +5,200 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FruitDrink | Konfigurator</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .mixer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .mixer-wrapper {
+      position: relative;
+      width: 200px;
+      height: 280px;
+    }
+
+    .mixer-glas {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 180px;
+      background: rgba(200, 240, 255, 0.25);
+      border: 3px solid rgba(100, 180, 220, 0.7);
+      border-top: none;
+      border-radius: 0 0 30px 30px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 8px;
+      box-shadow: inset 0 0 20px rgba(100,200,255,0.2), 2px 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .mixer-glas::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 8px;
+      width: 15px;
+      height: 100%;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+    }
+
+    .mixer-deckel {
+      position: absolute;
+      bottom: 235px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 20px;
+      background: linear-gradient(135deg, #607D8B, #90A4AE);
+      border-radius: 5px 5px 0 0;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    }
+
+    .mixer-knopf {
+      position: absolute;
+      bottom: 252px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 18px;
+      background: #37474F;
+      border-radius: 50% 50% 0 0;
+    }
+
+    .mixer-base {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 65px;
+      background: linear-gradient(135deg, #546E7A, #78909C);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .mixer-base::after {
+      content: 'FRUITDRINK';
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .mixer-motor {
+      position: absolute;
+      bottom: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 12px;
+      background: linear-gradient(135deg, #455A64, #607D8B);
+      border-radius: 3px;
+    }
+
+    .frucht-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      width: 100%;
+      padding: 4px;
+    }
+
+    .frucht-reihe {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+      width: 100%;
+    }
+
+    .frucht-emoji {
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      line-height: 1;
+      filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.2));
+    }
+
+    .frucht-emoji.einfall {
+      animation: einfall 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes einfall {
+      0% { transform: translateY(-60px) scale(0.3); opacity: 0; }
+      60% { transform: translateY(8px) scale(1.2); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .mixer-wrapper.mixen {
+      animation: mixerWackeln 0.15s ease-in-out infinite;
+    }
+
+    @keyframes mixerWackeln {
+      0%   { transform: rotate(-2deg) translateX(-3px); }
+      25%  { transform: rotate(2deg) translateX(3px); }
+      50%  { transform: rotate(-2deg) translateX(-3px); }
+      75%  { transform: rotate(1deg) translateX(2px); }
+      100% { transform: rotate(-1deg) translateX(-2px); }
+    }
+
+    .mixen-btn {
+      width: 160px;
+      height: 50px;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #2E7D32, #4CAF50);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(46,125,50,0.4);
+      transition: all 0.3s ease;
+      letter-spacing: 2px;
+    }
+
+    .mixen-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(46,125,50,0.5);
+    }
+
+    .mixen-btn:active {
+      transform: scale(0.95);
+    }
+
+    .mixen-btn.am-mixen {
+      background: linear-gradient(135deg, #F57F17, #FFC107);
+      animation: btnPuls 0.3s ease-in-out infinite alternate;
+    }
+
+    @keyframes btnPuls {
+      0% { box-shadow: 0 4px 15px rgba(245,127,23,0.4); }
+      100% { box-shadow: 0 8px 25px rgba(245,127,23,0.8); }
+    }
+
+    .preis-badge {
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+
+    .leer-hinweis {
+      font-size: 2.5rem;
+      opacity: 0.3;
+      margin-bottom: 0.5rem;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -28,16 +222,27 @@
     <div class="card">
       <div class="konfig-grid">
 
-        <!-- Vorschau links -->
+        <!-- Mixer Vorschau links -->
         <div class="vorschau-container">
-          <div id="drinkVorschau" style="font-size: 8rem; text-align: center; padding: 2rem; background: linear-gradient(135deg, #fff9f0, #fff); border-radius: 1rem; min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div id="drinkEmoji" style="font-size: 6rem;">🍹</div>
-            <div id="drinkName" style="margin-top: 1rem; font-size: 1.2rem; font-weight: 700; color: #333;">Dein Drink</div>
-            <div id="drinkZutaten" style="margin-top: 0.5rem; font-size: 0.9rem; color: #888;">Wähle deine Früchte</div>
-          </div>
-          <div style="margin-top: 1rem; text-align: center;">
-            <span style="color: var(--text-muted);">Preis:</span>
-            <span id="livePreis" style="font-size: 1.8rem; font-weight: 800; margin-left: 0.5rem;">2,99 €</span>
+          <div class="mixer-container">
+            <div class="mixer-wrapper" id="mixerWrapper">
+              <div class="mixer-knopf"></div>
+              <div class="mixer-deckel"></div>
+              <div class="mixer-glas" id="mixerGlas">
+                <div class="frucht-stack" id="fruchtStack">
+                  <div class="leer-hinweis" id="leerHinweis">🫙</div>
+                </div>
+              </div>
+              <div class="mixer-motor"></div>
+              <div class="mixer-base"></div>
+            </div>
+
+            <button class="mixen-btn" id="mixenBtn" onclick="mixen()">⚡ MIXEN</button>
+
+            <div class="preis-badge">
+              <span style="color: var(--text-muted); font-size: 0.9rem;">Preis:</span>
+              <span id="livePreis" style="font-size: 1.8rem; font-weight: 800; margin-left: 0.3rem;">2,99 €</span>
+            </div>
           </div>
         </div>
 
@@ -79,9 +284,15 @@
               <button class="auswahl-btn" data-wert="ananas" onclick="waehleOption('frucht3', 'ananas')">🍍 Ananas</button>
             </div>
           </div>
-
+<div class="option-gruppe">
+  <label>4. Eiswürfel</label>
+  <div class="auswahl-buttons" id="eisButtons">
+    <button class="auswahl-btn aktiv" data-wert="kein" onclick="waehleOption('eis', 'kein')">❌ Kein Eis</button>
+    <button class="auswahl-btn" data-wert="eis" onclick="waehleOption('eis', 'eis')">🧊 Mit Eis</button>
+  </div>
+</div>
           <div class="option-gruppe">
-            <label>4. Größe</label>
+            <label>5. Größe</label>
             <div class="auswahl-buttons" id="groesseButtons">
               <button class="auswahl-btn" data-wert="klein" onclick="waehleOption('groesse', 'klein')">Klein 250ml (1,99€)</button>
               <button class="auswahl-btn" data-wert="mittel" onclick="waehleOption('groesse', 'mittel')">Mittel 500ml (2,99€)</button>
@@ -89,11 +300,10 @@
             </div>
           </div>
 
-          <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
-            
-         <button class="btn-secondary" style="width: 100%;" onclick="drinkInWarenkorb()">
-  🛒 Drink in den Warenkorb
-</button>
+          <div style="margin-top: 2rem;">
+            <button class="btn-primary" style="width: 100%;" onclick="drinkInWarenkorb()">
+              🛒 Drink in den Warenkorb
+            </button>
           </div>
 
         </div>
@@ -104,11 +314,12 @@
   <script src="app.js"></script>
   <script>
     const fruchtemoji = {
-      apfel: "🍎", orange: "🍊", mango: "🥭", erdbeere: "🍓",
-      ananas: "🍍", kiwi: "🥝", himbeere: "🫐", zitrone: "🍋", keine: ""
-    };
+  apfel: "🍎", orange: "🍊", mango: "🥭", erdbeere: "🍓",
+  ananas: "🍍", kiwi: "🥝", himbeere: "🫐", zitrone: "🍋", eis: "🧊"
+};
 
-    let konfig = { frucht1: "apfel", frucht2: "keine", frucht3: "keine", groesse: "mittel" };
+    let konfig = { frucht1: null, frucht2: "keine", frucht3: "keine", groesse: "klein", eis: "kein" };
+    let amMixen = false;
 
     function rechnePreis() {
       const preise = { klein: 1.99, mittel: 2.99, gross: 3.99 };
@@ -117,13 +328,40 @@
     }
 
     function aktualisiereVorschau() {
-      const f1 = fruchtemoji[konfig.frucht1] || "🍹";
-      const f2 = konfig.frucht2 !== "keine" ? fruchtemoji[konfig.frucht2] : "";
-      const f3 = konfig.frucht3 !== "keine" ? fruchtemoji[konfig.frucht3] : "";
-      document.getElementById("drinkEmoji").textContent = f1 + f2 + f3 + "🥤";
-      const zutaten = [konfig.frucht1, konfig.frucht2, konfig.frucht3]
-        .filter(f => f !== "keine").join(" + ");
-      document.getElementById("drinkZutaten").textContent = zutaten;
+      const stack = document.getElementById("fruchtStack");
+      const leer = document.getElementById("leerHinweis");
+      const mengen = { klein: 1, mittel: 2, gross: 3 };
+      const menge = mengen[konfig.groesse] || 2;
+
+      const fruchten = [konfig.frucht1, konfig.frucht2, konfig.frucht3]
+  .filter(f => f && f !== "keine");
+if (konfig.eis === "eis") fruchten.push("eis");
+
+      if (fruchten.length === 0) {
+        stack.innerHTML = '<div class="leer-hinweis" id="leerHinweis">🫙</div>';
+        return;
+      }
+
+      // Berechne Emoji-Größe je nach Anzahl
+      const total = fruchten.length * menge;
+      const size = total <= 3 ? "2rem" : total <= 6 ? "1.5rem" : "1.1rem";
+
+      stack.innerHTML = "";
+
+      // Baue Reihen: jede Frucht menge-mal, gestapelt
+      fruchten.forEach((frucht, fi) => {
+        const reihe = document.createElement("div");
+        reihe.className = "frucht-reihe";
+        for (let i = 0; i < menge; i++) {
+          const span = document.createElement("span");
+          span.className = "frucht-emoji einfall";
+          span.style.fontSize = size;
+          span.textContent = fruchtemoji[frucht];
+          span.style.animationDelay = (fi * menge + i) * 0.08 + "s";
+          reihe.appendChild(span);
+        }
+        stack.appendChild(reihe);
+      });
     }
 
     function waehleOption(typ, wert) {
@@ -136,54 +374,82 @@
       rechnePreis();
     }
 
+    function mixen() {
+      const fruchten = [konfig.frucht1, konfig.frucht2, konfig.frucht3]
+        .filter(f => f && f !== "keine");
+
+      if (fruchten.length === 0) {
+        showToast("Bitte erst Früchte auswählen! 🍎", true);
+        return;
+      }
+
+      if (amMixen) return;
+      amMixen = true;
+
+      const wrapper = document.getElementById("mixerWrapper");
+      const btn = document.getElementById("mixenBtn");
+
+      wrapper.classList.add("mixen");
+      btn.classList.add("am-mixen");
+      btn.textContent = "⚡ MIXEN...";
+
+      setTimeout(() => {
+        wrapper.classList.remove("mixen");
+        btn.classList.remove("am-mixen");
+        btn.textContent = "⚡ MIXEN";
+        amMixen = false;
+        showToast("Perfekt gemixt! 🍹");
+      }, 2500);
+    }
+
     async function speichereKonfiguration() {
       try {
-        const res = await fetch(`${API}/config`, {
+        await fetch(`${API}/config`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify(konfig)
         });
-        const daten = await res.json();
-        if (daten.erfolg) showToast("Konfiguration gespeichert! 🍹");
-      } catch (err) {
-        showToast("Fehler beim Speichern", true);
-      }
+      } catch (err) {}
     }
-async function drinkInWarenkorb() {
-  await speichereKonfiguration();
-  const preise = { klein: 1.99, mittel: 2.99, gross: 3.99 };
-  const preis = preise[konfig.groesse] || 2.99;
-  const zutaten = [konfig.frucht1, konfig.frucht2, konfig.frucht3]
-    .filter(f => f && f !== "keine").join(" + ");
-  
-  sessionStorage.setItem("drinkImWarenkorb", JSON.stringify({
-    name: "🍹 " + zutaten,
-    preis: preis,
-    groesse: konfig.groesse
-  }));
-  
-  showToast("Drink in den Warenkorb gelegt! 🍹");
-  setTimeout(() => window.location.href = "warenkorb.html", 1000);
-}
+
+    async function drinkInWarenkorb() {
+      if (!konfig.frucht1) {
+        showToast("Bitte erst eine Frucht wählen! 🍎", true);
+        return;
+      }
+      await speichereKonfiguration();
+      const preise = { klein: 1.99, mittel: 2.99, gross: 3.99 };
+      const preis = preise[konfig.groesse] || 2.99;
+      const zutaten = [konfig.frucht1, konfig.frucht2, konfig.frucht3]
+        .filter(f => f && f !== "keine").join(" + ");
+
+      sessionStorage.setItem("drinkImWarenkorb", JSON.stringify({
+        name: "🍹 " + zutaten,
+        preis: preis,
+        groesse: konfig.groesse
+      }));
+
+      showToast("Drink in den Warenkorb gelegt! 🍹");
+      setTimeout(() => window.location.href = "warenkorb.html", 1000);
+    }
+
     async function ladeKonfiguration() {
       try {
         const res = await fetch(`${API}/config`, { credentials: "include" });
         const daten = await res.json();
         if (daten.frucht1) {
           waehleOption("frucht1", daten.frucht1);
-          waehleOption("frucht2", daten.frucht2 || "keine");
-          waehleOption("frucht3", daten.frucht3 || "keine");
+          if (daten.frucht2 && daten.frucht2 !== "keine") waehleOption("frucht2", daten.frucht2);
+          if (daten.frucht3 && daten.frucht3 !== "keine") waehleOption("frucht3", daten.frucht3);
           waehleOption("groesse", daten.groesse || "mittel");
         }
       } catch (err) {}
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      waehleOption("frucht1", "apfel");
-      waehleOption("groesse", "mittel");
-      ladeKonfiguration();
-    });
+  document.addEventListener("DOMContentLoaded", () => {
+  waehleOption("groesse", "klein");
+});
   </script>
 </body>
 </html>
