@@ -94,5 +94,25 @@ router.post("/checkout", async (req, res) => {
     res.status(500).json({ fehler: "Checkout Fehler" });
   }
 });
-
+router.patch("/cart/:id/menge", async (req, res) => {
+  const db = req.app.locals.db;
+  try {
+    const { delta } = req.body;
+    const [items] = await db.query(
+      "SELECT id, menge FROM cart_items WHERE id=? AND session_id=?",
+      [req.params.id, req.sessionID]
+    );
+    if (items.length === 0) return res.status(404).json({ fehler: "Nicht gefunden" });
+    
+    const neueMenge = items[0].menge + delta;
+    if (neueMenge <= 0) {
+      await db.query("DELETE FROM cart_items WHERE id=?", [req.params.id]);
+    } else {
+      await db.query("UPDATE cart_items SET menge=? WHERE id=?", [neueMenge, req.params.id]);
+    }
+    res.json({ erfolg: true });
+  } catch (err) {
+    res.status(500).json({ fehler: "Fehler" });
+  }
+});
 module.exports = router;
