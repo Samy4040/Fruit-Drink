@@ -91,7 +91,7 @@
       btn.textContent = "Verarbeite...";
 
       try {
-        const res = await fetch(`${API}/shop/checkout`, {
+        const res = await fetch(`${API}/cart/checkout`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

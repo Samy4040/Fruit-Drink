@@ -22,7 +22,6 @@
     <h1 class="page-title">👥 Community Drinks</h1>
     <p style="color: var(--text-muted); margin-bottom: 2rem;">Entdecke Drink-Kreationen anderer Nutzer und teile deine eigenen!</p>
 
-    <!-- Drink teilen -->
     <div class="card" style="margin-bottom: 2rem;">
       <h2 style="margin-bottom: 1.5rem;">🍹 Deinen Drink teilen</h2>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -42,7 +41,6 @@
       </button>
     </div>
 
-    <!-- Community Liste -->
     <div id="communityGrid" class="shop-grid">
       <p style="color: var(--text-muted);">Lade Community Drinks...</p>
     </div>
@@ -57,7 +55,7 @@
 
     async function ladeCommunity() {
       try {
-        const res = await fetch(`${API}/config/community`, { credentials: "include" });
+        const res = await fetch(`${API}/community`, { credentials: "include" });
         const drinks = await res.json();
         const grid = document.getElementById("communityGrid");
 
@@ -110,7 +108,7 @@
           return;
         }
 
-        const res = await fetch(`${API}/config/community`, {
+        const res = await fetch(`${API}/community`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

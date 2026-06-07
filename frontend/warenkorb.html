@@ -54,7 +54,7 @@
   <script>
     async function loadWarenkorb() {
       try {
-        const res = await fetch(`${API}/shop/cart`, { credentials: "include" });
+        const res = await fetch(`${API}/cart`, { credentials: "include" });
         const items = await res.json();
         const list = document.getElementById("cartList");
         const summary = document.getElementById("cartSummary");
@@ -105,10 +105,10 @@
                 <div class="cart-item-title">${item.name}</div>
                 <div class="cart-item-actions">
                   <div style="display: flex; align-items: center; gap: 0.5rem;">
-  <button class="btn-icon-only" onclick="mengeAendern('${item.id}', -1)" style="width:30px;height:30px;">➖</button>
-  <span style="background: var(--bg-light); padding: 0.2rem 0.8rem; border-radius: 4px; font-weight:700;">${item.menge}</span>
-  <button class="btn-icon-only" onclick="mengeAendern('${item.id}', 1)" style="width:30px;height:30px;">➕</button>
-</div>
+                    <button class="btn-icon-only" onclick="mengeAendern('${item.id}', -1)" style="width:30px;height:30px;">➖</button>
+                    <span style="background: var(--bg-light); padding: 0.2rem 0.8rem; border-radius: 4px; font-weight:700;">${item.menge}</span>
+                    <button class="btn-icon-only" onclick="mengeAendern('${item.id}', 1)" style="width:30px;height:30px;">➕</button>
+                  </div>
                   <button class="btn-icon-only" onclick="removeFromCart('${item.id}')">🗑️</button>
                 </div>
               </div>
@@ -130,23 +130,23 @@
       loadWarenkorb();
     }
 
- async function removeFromCart(id) {
-  await fetch(`${API}/shop/cart/${id}`, { method: "DELETE", credentials: "include" });
-  showToast("Artikel entfernt");
-  loadWarenkorb();
-  updateCartBadge();
-}
+    async function removeFromCart(id) {
+      await fetch(`${API}/cart/${id}`, { method: "DELETE", credentials: "include" });
+      showToast("Artikel entfernt");
+      loadWarenkorb();
+      updateCartBadge();
+    }
 
-async function mengeAendern(id, delta) {
-  await fetch(`${API}/shop/cart/${id}/menge`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ delta })
-  });
-  loadWarenkorb();
-  updateCartBadge();
-}
+    async function mengeAendern(id, delta) {
+      await fetch(`${API}/cart/${id}/menge`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ delta })
+      });
+      loadWarenkorb();
+      updateCartBadge();
+    }
 
     window.loadWarenkorb = loadWarenkorb;
     document.addEventListener("DOMContentLoaded", loadWarenkorb);

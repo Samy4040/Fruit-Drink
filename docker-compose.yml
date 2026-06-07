@@ -1,7 +1,9 @@
-# docker-compose.yml – Startet alle Services für den Fruit Drink Konfigurator
-
 services:
-  # MySQL-Datenbank
+
+  # ════════════════════════════════════════════════════════════
+  # INFRASTRUCTURE
+  # ════════════════════════════════════════════════════════════
+
   mysql:
     image: mysql:8.0
     container_name: fruitdrink-mysql
@@ -13,14 +15,14 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./infrastructure/db-init/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-fruitdrink123}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pfruitdrink123"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 15
+      start_period: 60s
 
-  # Redis für Sessions und Cache
   redis:
     image: redis:7-alpine
     container_name: fruitdrink-redis
@@ -33,29 +35,128 @@ services:
       timeout: 3s
       retries: 5
 
-  # Node.js Backend
-  backend:
-    build: ./backend
-    container_name: fruitdrink-backend
+  # ════════════════════════════════════════════════════════════
+  # MICROSERVICES
+  # ════════════════════════════════════════════════════════════
+
+  konfigurator-service:
+    build: ./services/konfigurator-service
+    container_name: fruitdrink-konfigurator
     restart: always
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
+      PORT: 3001
       DB_HOST: mysql
       DB_USER: root
       DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-fruitdrink123}
       DB_NAME: fruitdrink_db
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      SESSION_SECRET: ${SESSION_SECRET:-mein-geheimes-session-secret}
-      NODE_ENV: production
+      SESSION_SECRET: ${SESSION_SECRET:-fruitdrink-secret}
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
 
-  # Nginx Frontend
+  shop-service:
+    build: ./services/shop-service
+    container_name: fruitdrink-shop
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-fruitdrink123}
+      DB_NAME: fruitdrink_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SESSION_SECRET: ${SESSION_SECRET:-fruitdrink-secret}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  community-service:
+    build: ./services/community-service
+    container_name: fruitdrink-community
+    restart: always
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-fruitdrink123}
+      DB_NAME: fruitdrink_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SESSION_SECRET: ${SESSION_SECRET:-fruitdrink-secret}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ════════════════════════════════════════════════════════════
+  # API GATEWAY
+  # ════════════════════════════════════════════════════════════
+
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: fruitdrink-gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      LB_KONFIGURATOR_URL: http://lb-konfigurator:80
+      LB_SHOP_URL: http://lb-shop:80
+      LB_COMMUNITY_URL: http://lb-community:80
+    depends_on:
+      - lb-konfigurator
+      - lb-shop
+      - lb-community
+
+  # ════════════════════════════════════════════════════════════
+  # LOAD BALANCERS
+  # ════════════════════════════════════════════════════════════
+
+  lb-konfigurator:
+    image: nginx:alpine
+    container_name: fruitdrink-lb-konfigurator
+    restart: always
+    volumes:
+      - ./load-balancers/lb-konfigurator:/etc/nginx/conf.d:ro
+    depends_on:
+      - konfigurator-service
+
+  lb-shop:
+    image: nginx:alpine
+    container_name: fruitdrink-lb-shop
+    restart: always
+    volumes:
+      - ./load-balancers/lb-shop:/etc/nginx/conf.d:ro
+    depends_on:
+      - shop-service
+
+  lb-community:
+    image: nginx:alpine
+    container_name: fruitdrink-lb-community
+    restart: always
+    volumes:
+      - ./load-balancers/lb-community:/etc/nginx/conf.d:ro
+    depends_on:
+      - community-service
+
+  # ════════════════════════════════════════════════════════════
+  # FRONTEND
+  # ════════════════════════════════════════════════════════════
+
   frontend:
     build: ./frontend
     container_name: fruitdrink-frontend
@@ -63,7 +164,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - backend
+      - api-gateway
 
 volumes:
   mysql_data:

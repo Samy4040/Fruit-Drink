@@ -24,7 +24,7 @@ function showToast(message, isError = false) {
 // Warenkorb Badge
 async function updateCartBadge() {
   try {
-    const res = await fetch(`${API}/shop/cart`, { credentials: "include" });
+    const res = await fetch(`${API}/cart`, { credentials: "include" });
     if (!res.ok) return;
     const items = await res.json();
     const count = items.reduce((acc, item) => acc + item.menge, 0);
@@ -39,7 +39,7 @@ async function updateCartBadge() {
 // Artikel in Warenkorb
 async function addToCart(accessoryId) {
   try {
-    const res = await fetch(`${API}/shop/cart`, {
+    const res = await fetch(`${API}/cart`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
